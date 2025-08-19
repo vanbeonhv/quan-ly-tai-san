@@ -1,6 +1,8 @@
 package Model;
 
-public class TaiSan {
+import java.io.Serializable;
+
+public class TaiSan implements Serializable{
     private String maTaiSan;
     private String tenTaiSan;
     private String loaiTaiSan;

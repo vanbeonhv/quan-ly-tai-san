@@ -1,0 +1,35 @@
+package Model;
+
+import java.io.Serializable;
+
+/**
+ *
+ * @author Marc
+ */
+public class Event implements Serializable {
+
+    private String action;
+    private TaiSan taisan;
+
+    public Event(String action, TaiSan taisan) {
+        this.action = action;
+        this.taisan = taisan;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public TaiSan getTaisan() {
+        return taisan;
+    }
+
+    public void setTaisan(TaiSan taisan) {
+        this.taisan = taisan;
+    }
+
+}

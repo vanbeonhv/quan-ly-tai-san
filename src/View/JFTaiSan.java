@@ -1,25 +1,99 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package View;
 
+import Controller.ClientController;
+import Model.Event;
+import Model.TaiSan;
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author Marc
  */
 public class JFTaiSan extends javax.swing.JFrame {
-    
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(JFTaiSan.class.getName());
 
-    /**
-     * Creates new form JFTaiSan
-     */
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(JFTaiSan.class.getName());
+    private TaiSan ts;
+
+    private List<TaiSan> list = new ArrayList();
+
     public JFTaiSan() {
         initComponents();
         this.jPanel1.setBackground(Color.GRAY);
+        list.add(new TaiSan("1", "tivi", "high", "phong khach", 1000));
+        list.add(new TaiSan("2", "Tu lanh", "high", "phong bep", 2500));
+        list.add(new TaiSan("3", "May giat", "low", "phong tam", 1500));
+        list.add(new TaiSan("4", "May lanh", "high", "phong ngu", 3000));
+        list.add(new TaiSan("5", "Lo vi song", "low", "phong bep", 500));
+        list.add(new TaiSan("6", "May hut bui", "low", "phong khach", 750));
+
+        ViewTable();
+
+    }
+
+    public void ViewTable() {
+        DefaultTableModel model = (DefaultTableModel) this.tbTaiSan.getModel();
+        model.setNumRows(0);
+        for (TaiSan taiSan : list) {
+            Object[] rowData = {
+                taiSan.getMaTaiSan(),
+                taiSan.getTenTaiSan(),
+                taiSan.getLoaiTaiSan(),
+                taiSan.getViTriPhong(),
+                taiSan.getGiaTri()
+            };
+            model.addRow(rowData);
+        }
+    }
+
+    public void View(int pos) {
+        TaiSan ts = list.get(pos);
+        this.txtMaTS.setText(ts.getMaTaiSan());
+        this.txtGiaTri.setText(Double.toString(ts.getGiaTri()));
+        this.txtLoaiTS.setText(ts.getLoaiTaiSan());
+        this.txtTenTS.setText(ts.getTenTaiSan());
+        this.txtViTriPhong.setText(ts.getViTriPhong());
+    }
+
+    public TaiSan getInput() {
+        TaiSan ts = new TaiSan();
+        ts.setMaTaiSan(txtMaTS.getText());
+        ts.setTenTaiSan(txtTenTS.getText());
+        ts.setLoaiTaiSan(txtLoaiTS.getText());
+        ts.setViTriPhong(txtViTriPhong.getText());
+
+        try {
+            ts.setGiaTri(Double.parseDouble(txtGiaTri.getText()));
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            throw new NumberFormatException(e.getMessage());
+        }
+        return ts;
+    }
+
+    public void Reset() {
+        this.txtMaTS.setText("");
+        this.txtGiaTri.setText("");
+        this.txtLoaiTS.setText("");
+        this.txtTenTS.setText("");
+        this.txtViTriPhong.setText("");
+    }
+
+    private TaiSan findTaiSanById(String id) {
+        for (TaiSan ts : list) {
+            if (ts.getMaTaiSan().equals(id)) {
+                return ts;
+            }
+        }
+        return null;
+    }
+
+    private void sendToServer(Event e) {
+        ClientController clientCtr = new ClientController();
+        clientCtr.openConnection();
+        clientCtr.sendData(e);
     }
 
     /**
@@ -40,13 +114,15 @@ public class JFTaiSan extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         txtMaTS = new javax.swing.JTextField();
-        txxTenTS = new javax.swing.JTextField();
-        txxLoaiTS = new javax.swing.JTextField();
-        txxViTriPhong = new javax.swing.JTextField();
+        txtTenTS = new javax.swing.JTextField();
+        txtLoaiTS = new javax.swing.JTextField();
+        txtViTriPhong = new javax.swing.JTextField();
         txtGiaTri = new javax.swing.JTextField();
         btnThem = new javax.swing.JButton();
         btnSua = new javax.swing.JButton();
         btnXoa = new javax.swing.JButton();
+        btnClear = new javax.swing.JButton();
+        btnLuu = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbTaiSan = new javax.swing.JTable();
@@ -89,6 +165,7 @@ public class JFTaiSan extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel6.setText("Giá trị:");
 
+        txtMaTS.setEditable(false);
         txtMaTS.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         txtMaTS.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -96,24 +173,24 @@ public class JFTaiSan extends javax.swing.JFrame {
             }
         });
 
-        txxTenTS.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        txxTenTS.addActionListener(new java.awt.event.ActionListener() {
+        txtTenTS.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtTenTS.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txxTenTSActionPerformed(evt);
+                txtTenTSActionPerformed(evt);
             }
         });
 
-        txxLoaiTS.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        txxLoaiTS.addActionListener(new java.awt.event.ActionListener() {
+        txtLoaiTS.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtLoaiTS.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txxLoaiTSActionPerformed(evt);
+                txtLoaiTSActionPerformed(evt);
             }
         });
 
-        txxViTriPhong.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        txxViTriPhong.addActionListener(new java.awt.event.ActionListener() {
+        txtViTriPhong.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtViTriPhong.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txxViTriPhongActionPerformed(evt);
+                txtViTriPhongActionPerformed(evt);
             }
         });
 
@@ -124,7 +201,6 @@ public class JFTaiSan extends javax.swing.JFrame {
             }
         });
 
-        btnThem.setBackground(new java.awt.Color(153, 204, 255));
         btnThem.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnThem.setText("Thêm");
         btnThem.addActionListener(new java.awt.event.ActionListener() {
@@ -133,9 +209,13 @@ public class JFTaiSan extends javax.swing.JFrame {
             }
         });
 
-        btnSua.setBackground(new java.awt.Color(255, 204, 153));
         btnSua.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnSua.setText("Sửa");
+        btnSua.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnSuaMouseClicked(evt);
+            }
+        });
         btnSua.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSuaActionPerformed(evt);
@@ -148,6 +228,23 @@ public class JFTaiSan extends javax.swing.JFrame {
         btnXoa.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnXoaActionPerformed(evt);
+            }
+        });
+
+        btnClear.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnClear.setText("Làm mới");
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearActionPerformed(evt);
+            }
+        });
+
+        btnLuu.setBackground(new java.awt.Color(153, 204, 255));
+        btnLuu.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnLuu.setText("Lưu");
+        btnLuu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLuuActionPerformed(evt);
             }
         });
 
@@ -165,15 +262,15 @@ public class JFTaiSan extends javax.swing.JFrame {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txxTenTS))
+                        .addComponent(txtTenTS))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txxLoaiTS))
+                        .addComponent(txtLoaiTS))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txxViTriPhong))
+                        .addComponent(txtViTriPhong))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -187,38 +284,48 @@ public class JFTaiSan extends javax.swing.JFrame {
                                 .addComponent(btnSua)
                                 .addGap(27, 27, 27)
                                 .addComponent(btnXoa)
-                                .addGap(0, 0, Short.MAX_VALUE)))))
-                .addContainerGap(107, Short.MAX_VALUE))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(btnLuu)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnClear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                .addContainerGap(95, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2)
-                    .addComponent(txtMaTS, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(1, 1, 1)
+                        .addComponent(txtMaTS, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(txxTenTS, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtTenTS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(27, 27, 27)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(txxLoaiTS, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtLoaiTS, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(txxViTriPhong, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtViTriPhong, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
-                    .addComponent(txtGiaTri, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtGiaTri, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(81, 81, 81)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnThem)
                     .addComponent(btnSua)
                     .addComponent(btnXoa))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnLuu)
+                    .addComponent(btnClear))
+                .addGap(40, 40, 40))
         );
 
         tbTaiSan.setModel(new javax.swing.table.DefaultTableModel(
@@ -247,6 +354,11 @@ public class JFTaiSan extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        tbTaiSan.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbTaiSanMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tbTaiSan);
         if (tbTaiSan.getColumnModel().getColumnCount() > 0) {
             tbTaiSan.getColumnModel().getColumn(2).setResizable(false);
@@ -266,7 +378,7 @@ public class JFTaiSan extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addContainerGap(38, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -296,17 +408,17 @@ public class JFTaiSan extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtMaTSActionPerformed
 
-    private void txxTenTSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txxTenTSActionPerformed
+    private void txtTenTSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTenTSActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txxTenTSActionPerformed
+    }//GEN-LAST:event_txtTenTSActionPerformed
 
-    private void txxLoaiTSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txxLoaiTSActionPerformed
+    private void txtLoaiTSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtLoaiTSActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txxLoaiTSActionPerformed
+    }//GEN-LAST:event_txtLoaiTSActionPerformed
 
-    private void txxViTriPhongActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txxViTriPhongActionPerformed
+    private void txtViTriPhongActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtViTriPhongActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txxViTriPhongActionPerformed
+    }//GEN-LAST:event_txtViTriPhongActionPerformed
 
     private void txtGiaTriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtGiaTriActionPerformed
         // TODO add your handling code here:
@@ -314,15 +426,55 @@ public class JFTaiSan extends javax.swing.JFrame {
 
     private void btnThemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemActionPerformed
         // TODO add your handling code here:
+        Reset();
     }//GEN-LAST:event_btnThemActionPerformed
 
     private void btnSuaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSuaActionPerformed
         // TODO add your handling code here:
+        int pos = this.tbTaiSan.getSelectedRow();
+        if (pos == -1) {
+            Message.ShowErrorMessage("Hãy chọn tài sản muốn sửa trước");
+            return;
+        }
+        View(pos);
     }//GEN-LAST:event_btnSuaActionPerformed
 
     private void btnXoaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnXoaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnXoaActionPerformed
+
+    private void tbTaiSanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbTaiSanMouseClicked
+        // TODO add your handling code here:
+//        int pos = this.tbTaiSan.getSelectedRow();
+//        View(pos);
+    }//GEN-LAST:event_tbTaiSanMouseClicked
+
+    private void btnSuaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnSuaMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnSuaMouseClicked
+
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnClearActionPerformed
+
+    private void btnLuuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLuuActionPerformed
+        // TODO add your handling code here:
+        try {
+            TaiSan taisan = getInput();
+            Event event = null;
+            if (taisan.getMaTaiSan().isEmpty()) {
+                event = new Event("add", taisan);
+            } else {
+                event = new Event("edit", taisan);
+            }
+            sendToServer(event);
+
+            ViewTable();
+            Reset();
+        } catch (Exception e) {
+            Message.ShowErrorMessage("Giá trị nhập phải là số");
+        }
+    }//GEN-LAST:event_btnLuuActionPerformed
 
     /**
      * @param args the command line arguments
@@ -350,6 +502,8 @@ public class JFTaiSan extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnClear;
+    private javax.swing.JButton btnLuu;
     private javax.swing.JButton btnSua;
     private javax.swing.JButton btnThem;
     private javax.swing.JButton btnXoa;
@@ -365,9 +519,9 @@ public class JFTaiSan extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tbTaiSan;
     private javax.swing.JTextField txtGiaTri;
+    private javax.swing.JTextField txtLoaiTS;
     private javax.swing.JTextField txtMaTS;
-    private javax.swing.JTextField txxLoaiTS;
-    private javax.swing.JTextField txxTenTS;
-    private javax.swing.JTextField txxViTriPhong;
+    private javax.swing.JTextField txtTenTS;
+    private javax.swing.JTextField txtViTriPhong;
     // End of variables declaration//GEN-END:variables
 }
