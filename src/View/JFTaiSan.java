@@ -99,7 +99,6 @@ public class JFTaiSan extends javax.swing.JFrame {
             Message.ShowErrorMessage(errorMessage);
         }
         clientCtr.closeConnection();
-
     }
 
     private String getSuccessMessage(String operation) {

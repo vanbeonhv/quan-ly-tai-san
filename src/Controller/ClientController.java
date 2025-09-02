@@ -22,6 +22,7 @@ public class ClientController {
     public void openConnection() {
         try {
             myClient = new DatagramSocket(clientPort);
+            myClient.setSoTimeout(60* 1000);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
