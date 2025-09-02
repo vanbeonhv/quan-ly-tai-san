@@ -6,6 +6,7 @@ import Model.TaiSan;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -23,13 +24,7 @@ public class JFTaiSan extends javax.swing.JFrame {
         initComponents();
         this.jPanel1.setBackground(Color.GRAY);
 
-        list.add(new TaiSan("1", "tivi", "high", "phong khach", 1000));
-        list.add(new TaiSan("2", "Tu lanh", "high", "phong bep", 2500));
-        list.add(new TaiSan("3", "May giat", "low", "phong tam", 1500));
-        list.add(new TaiSan("4", "May lanh", "high", "phong ngu", 3000));
-        list.add(new TaiSan("5", "Lo vi song", "low", "phong bep", 500));
-        list.add(new TaiSan("6", "May hut bui", "low", "phong khach", 750));
-
+        loadDataFromServer();
         ViewTable();
 
     }
@@ -91,19 +86,74 @@ public class JFTaiSan extends javax.swing.JFrame {
         return null;
     }
 
-    private void sendToServer(Event e) {
+    private void sendToServer(Event e, String operation) {
         ClientController clientCtr = new ClientController();
         clientCtr.openConnection();
         clientCtr.sendData(e);
         String result = clientCtr.receiveData();
         if (result.equals("true")) {
-            Message.ShowSuccessMessage("Thêm thành công!");
+            String successMessage = getSuccessMessage(operation);
+            Message.ShowSuccessMessage(successMessage);
         } else {
-            Message.ShowErrorMessage("Thêm thất bại");
+            String errorMessage = getErrorMessage(operation);
+            Message.ShowErrorMessage(errorMessage);
         }
         clientCtr.closeConnection();
 
     }
+
+    private String getSuccessMessage(String operation) {
+        switch (operation) {
+            case "add":
+                return "Thêm tài sản thành công!";
+            case "edit":
+                return "Cập nhật tài sản thành công!";
+            case "delete":
+                return "Xóa tài sản thành công!";
+            default:
+                return "Thao tác thành công!";
+        }
+    }
+
+    private String getErrorMessage(String operation) {
+        switch (operation) {
+            case "add":
+                return "Thêm tài sản thất bại!";
+            case "edit":
+                return "Cập nhật tài sản thất bại!";
+            case "delete":
+                return "Xóa tài sản thất bại!";
+            default:
+                return "Thao tác thất bại!";
+        }
+    }
+
+    private void loadDataFromServer() {
+        try {
+            ClientController clientCtr = new ClientController();
+            clientCtr.openConnection();
+            Event event = new Event("fetch_all");
+            clientCtr.sendData(event);
+            list = clientCtr.receiveDataList();
+            clientCtr.closeConnection();
+            System.out.println("Đã tải " + list.size() + " tài sản từ server");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Không thể kết nối server, sử dụng dữ liệu mẫu");
+            loadSampleData();
+        }
+    }
+
+    private void loadSampleData() {
+        list.clear();
+        list.add(new TaiSan("1", "tivi", "high", "phong khach", 1000));
+        list.add(new TaiSan("2", "Tu lanh", "high", "phong bep", 2500));
+        list.add(new TaiSan("3", "May giat", "low", "phong tam", 1500));
+        list.add(new TaiSan("4", "May lanh", "high", "phong ngu", 3000));
+        list.add(new TaiSan("5", "Lo vi song", "low", "phong bep", 500));
+        list.add(new TaiSan("6", "May hut bui", "low", "phong khach", 750));
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -449,7 +499,33 @@ public class JFTaiSan extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSuaActionPerformed
 
     private void btnXoaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnXoaActionPerformed
-        // TODO add your handling code here:
+        int pos = this.tbTaiSan.getSelectedRow();
+        if (pos == -1) {
+            Message.ShowErrorMessage("Hãy chọn tài sản muốn xóa trước");
+            return;
+        }
+        
+        int confirm = javax.swing.JOptionPane.showConfirmDialog(
+            this, 
+            "Bạn có chắc chắn muốn xóa tài sản này?", 
+            "Xác nhận xóa", 
+            javax.swing.JOptionPane.YES_NO_OPTION
+        );
+        
+        if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+            TaiSan selectedTaiSan = list.get(pos);
+            Event event = new Event("delete", selectedTaiSan);
+            sendToServer(event, "delete");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        
+            loadDataFromServer();
+            ViewTable();
+            Reset();
+        }
     }//GEN-LAST:event_btnXoaActionPerformed
 
     private void tbTaiSanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbTaiSanMouseClicked
@@ -463,7 +539,10 @@ public class JFTaiSan extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSuaMouseClicked
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
-        // TODO add your handling code here:
+        Reset();
+        loadDataFromServer();
+        ViewTable();
+        Message.ShowInfoMessage("Đã làm mới dữ liệu từ server");
     }//GEN-LAST:event_btnClearActionPerformed
 
     private void btnLuuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLuuActionPerformed
@@ -471,14 +550,21 @@ public class JFTaiSan extends javax.swing.JFrame {
         try {
             TaiSan taisan = getInput();
             Event event = null;
+            String operation = null;
             if (taisan.getMaTaiSan().isEmpty()) {
                 event = new Event("add", taisan);
+                operation = "add";
             } else {
                 event = new Event("edit", taisan);
+                operation = "edit";
             }
-            sendToServer(event);
-
-            Thread.sleep(500);
+            sendToServer(event, operation);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+            loadDataFromServer();
             ViewTable();
             Reset();
         } catch (Exception e) {

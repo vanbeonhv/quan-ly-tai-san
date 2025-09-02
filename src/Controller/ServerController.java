@@ -57,8 +57,16 @@ public class ServerController {
 
         switch (event.getAction()) {
             case "add":
-                addTaiSan(event.getTaisan());
-                result = "true";
+                result = addTaiSan(event.getTaisan()) ? "true" : "false";
+                break;
+            case "edit":
+                result = updateTaiSan(event.getTaisan()) ? "true" : "false";
+                break;
+            case "delete":
+                result = deleteTaiSan(event.getTaisan()) ? "true" : "false";
+                break;
+            case "fetch_all":
+                result = getAllTaiSan();
                 break;
             default:
                 System.out.println("Error: action khong hop le: " + event.getAction());
@@ -96,6 +104,44 @@ public class ServerController {
                 + taisan.getGiaTri()
                 + ")";
         return executeUpdate(query);
+    }
+
+    private boolean updateTaiSan(TaiSan taisan) {
+        String query = "UPDATE `tai_san` SET "
+                + "`ten_tai_san`='" + taisan.getTenTaiSan() + "', "
+                + "`loai_tai_san`='" + taisan.getLoaiTaiSan() + "', "
+                + "`vi_tri_phong_hien_tai`='" + taisan.getViTriPhong() + "', "
+                + "`gia_tri`=" + taisan.getGiaTri() + " "
+                + "WHERE `ma_tai_san`='" + taisan.getMaTaiSan() + "'";
+        return executeUpdate(query);
+    }
+
+    private boolean deleteTaiSan(TaiSan taisan) {
+        String query = "DELETE FROM `tai_san` WHERE `ma_tai_san`='" + taisan.getMaTaiSan() + "'";
+        return executeUpdate(query);
+    }
+
+    private java.util.List<TaiSan> getAllTaiSan() {
+        java.util.List<TaiSan> list = new java.util.ArrayList<>();
+        String query = "SELECT `ma_tai_san`, `ten_tai_san`, `loai_tai_san`, `vi_tri_phong_hien_tai`, `gia_tri` FROM `tai_san`";
+        try {
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                TaiSan ts = new TaiSan();
+                ts.setMaTaiSan(rs.getString("ma_tai_san"));
+                ts.setTenTaiSan(rs.getString("ten_tai_san"));
+                ts.setLoaiTaiSan(rs.getString("loai_tai_san"));
+                ts.setViTriPhong(rs.getString("vi_tri_phong_hien_tai"));
+                ts.setGiaTri(rs.getDouble("gia_tri"));
+                list.add(ts);
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
     private boolean executeQuery(String query) {

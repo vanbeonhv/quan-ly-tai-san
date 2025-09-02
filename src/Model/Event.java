@@ -16,6 +16,11 @@ public class Event implements Serializable {
         this.taisan = taisan;
     }
 
+    public Event(String action) {
+        this.action = action;
+        this.taisan = null;
+    }
+
     public String getAction() {
         return action;
     }
