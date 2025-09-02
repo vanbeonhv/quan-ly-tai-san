@@ -13,6 +13,7 @@ import java.net.InetAddress;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 public class ServerController {
@@ -60,7 +61,8 @@ public class ServerController {
                 result = "true";
                 break;
             default:
-                throw new AssertionError();
+                System.out.println("Error: action khong hop le: " + event.getAction());
+                break;
         }
 
         sendData(result);
@@ -93,7 +95,7 @@ public class ServerController {
                 + "',"
                 + taisan.getGiaTri()
                 + ")";
-        return executeQuery(query);
+        return executeUpdate(query);
     }
 
     private boolean executeQuery(String query) {
@@ -107,6 +109,17 @@ public class ServerController {
             e.printStackTrace();
         }
         return false;
+    }
+
+    private boolean executeUpdate(String query) {
+        try {
+            Statement stmt = con.createStatement();
+            int rowsAffected = stmt.executeUpdate(query);
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private void sendData(Object result) {

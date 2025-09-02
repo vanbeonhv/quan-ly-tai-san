@@ -22,6 +22,7 @@ public class JFTaiSan extends javax.swing.JFrame {
     public JFTaiSan() {
         initComponents();
         this.jPanel1.setBackground(Color.GRAY);
+
         list.add(new TaiSan("1", "tivi", "high", "phong khach", 1000));
         list.add(new TaiSan("2", "Tu lanh", "high", "phong bep", 2500));
         list.add(new TaiSan("3", "May giat", "low", "phong tam", 1500));
@@ -94,6 +95,14 @@ public class JFTaiSan extends javax.swing.JFrame {
         ClientController clientCtr = new ClientController();
         clientCtr.openConnection();
         clientCtr.sendData(e);
+        String result = clientCtr.receiveData();
+        if (result.equals("true")) {
+            Message.ShowSuccessMessage("Thêm thành công!");
+        } else {
+            Message.ShowErrorMessage("Thêm thất bại");
+        }
+        clientCtr.closeConnection();
+
     }
 
     /**
@@ -469,6 +478,7 @@ public class JFTaiSan extends javax.swing.JFrame {
             }
             sendToServer(event);
 
+            Thread.sleep(500);
             ViewTable();
             Reset();
         } catch (Exception e) {
