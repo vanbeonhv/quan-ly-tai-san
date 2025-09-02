@@ -82,52 +82,17 @@ public class JFTaiSan extends javax.swing.JFrame {
         this.txtViTriPhong.setText("");
     }
 
-    private TaiSan findTaiSanById(String id) {
-        for (TaiSan ts : list) {
-            if (ts.getMaTaiSan().equals(id)) {
-                return ts;
-            }
-        }
-        return null;
-    }
-
     private void sendToServer(Event e, String operation) {
         ClientController clientCtr = new ClientController();
         clientCtr.openConnection();
         clientCtr.sendData(e);
         String result = clientCtr.receiveData();
         if (result.equals("true")) {
-            String successMessage = getGenericSuccessMessage(operation);
-            Message.ShowSuccessMessage(successMessage);
+            Message.ShowSuccessMessage("Thành công!");
         } else {
-            String errorMessage = getGenericErrorMessage(operation);
-            Message.ShowErrorMessage(errorMessage);
+            Message.ShowErrorMessage("Thất bại!");
         }
         clientCtr.closeConnection();
-    }
-
-    private String getGenericSuccessMessage(String operation) {
-        if (operation.contains("add") || operation.contains("phong_add")) {
-            return "Thêm thành công!";
-        } else if (operation.contains("edit") || operation.contains("phong_edit")) {
-            return "Cập nhật thành công!";
-        } else if (operation.contains("delete") || operation.contains("phong_delete")) {
-            return "Xóa thành công!";
-        } else {
-            return "Thao tác thành công!";
-        }
-    }
-
-    private String getGenericErrorMessage(String operation) {
-        if (operation.contains("add") || operation.contains("phong_add")) {
-            return "Thêm thất bại!";
-        } else if (operation.contains("edit") || operation.contains("phong_edit")) {
-            return "Cập nhật thất bại!";
-        } else if (operation.contains("delete") || operation.contains("phong_delete")) {
-            return "Xóa thất bại!";
-        } else {
-            return "Thao tác thất bại!";
-        }
     }
 
     private void loadDataFromServer() {
@@ -162,11 +127,9 @@ public class JFTaiSan extends javax.swing.JFrame {
         clientCtr.sendData(e);
         String result = clientCtr.receiveData();
         if (result.equals("true")) {
-            String successMessage = getGenericSuccessMessage(operation);
-            Message.ShowSuccessMessage(successMessage);
+            Message.ShowSuccessMessage("Thành công!");
         } else {
-            String errorMessage = getGenericErrorMessage(operation);
-            Message.ShowErrorMessage(errorMessage);
+            Message.ShowErrorMessage("Thất bại!");
         }
         clientCtr.closeConnection();
     }
@@ -216,26 +179,10 @@ public class JFTaiSan extends javax.swing.JFrame {
         return phong;
     }
 
-    public void viewPhong(int pos) {
-        Phong phong = phongList.get(pos);
-        txtMaPhong.setText(String.valueOf(phong.getMaPhong()));
-        txtTenPhong.setText(phong.getTen());
-        txtMoTaPhong.setText(phong.getMoTa());
-    }
-
     public void resetPhongForm() {
         txtMaPhong.setText("");
         txtTenPhong.setText("");
         txtMoTaPhong.setText("");
-    }
-
-    private Phong findPhongById(int id) {
-        for (Phong phong : phongList) {
-            if (phong.getMaPhong() == id) {
-                return phong;
-            }
-        }
-        return null;
     }
 
     /**
@@ -828,7 +775,12 @@ public class JFTaiSan extends javax.swing.JFrame {
     }//GEN-LAST:event_txtMoTaPhongActionPerformed
 
     private void btnThemPhongActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemPhongActionPerformed
-        // TODO add your handling code here:
+        Phong phong = getPhongInput();
+        Event event = new Event("phong_add", phong);
+        sendPhongToServer(event, "phong_add");
+        resetPhongForm();
+        loadPhongFromServer();
+        viewPhongTable();
     }//GEN-LAST:event_btnThemPhongActionPerformed
 
     /**

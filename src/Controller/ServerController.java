@@ -71,12 +71,6 @@ public class ServerController {
             case "phong_add":
                 result = addPhong(event.getPhong()) ? "true" : "false";
                 break;
-            case "phong_edit":
-                result = updatePhong(event.getPhong()) ? "true" : "false";
-                break;
-            case "phong_delete":
-                result = deletePhong(event.getPhong()) ? "true" : "false";
-                break;
             case "phong_fetch_all":
                 result = getAllPhong();
                 break;
@@ -163,18 +157,6 @@ public class ServerController {
         return executeUpdate(query);
     }
 
-    private boolean updatePhong(Model.Phong phong) {
-        String query = "UPDATE `phong` SET "
-                + "`ten`='" + phong.getTen() + "', "
-                + "`mo_ta`='" + phong.getMoTa() + "' "
-                + "WHERE `ma_phong`=" + phong.getMaPhong();
-        return executeUpdate(query);
-    }
-
-    private boolean deletePhong(Model.Phong phong) {
-        String query = "DELETE FROM `phong` WHERE `ma_phong`=" + phong.getMaPhong();
-        return executeUpdate(query);
-    }
 
     private java.util.List<Model.Phong> getAllPhong() {
         java.util.List<Model.Phong> list = new java.util.ArrayList<>();
