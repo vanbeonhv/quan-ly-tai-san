@@ -84,4 +84,20 @@ public class ClientController {
         }
         return result;
     }
+
+    @SuppressWarnings("unchecked")
+    public java.util.List<Model.Phong> receivePhongList() {
+        java.util.List<Model.Phong> result = new java.util.ArrayList<>();
+        try {
+            byte[] receiveData = new byte[4096];
+            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+            myClient.receive(receivePacket);
+            ByteArrayInputStream bais = new ByteArrayInputStream(receiveData);
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            result = (java.util.List<Model.Phong>) ois.readObject();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return result;
+    }
 }

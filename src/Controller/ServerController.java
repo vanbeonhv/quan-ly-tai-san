@@ -68,6 +68,18 @@ public class ServerController {
             case "fetch_all":
                 result = getAllTaiSan();
                 break;
+            case "phong_add":
+                result = addPhong(event.getPhong()) ? "true" : "false";
+                break;
+            case "phong_edit":
+                result = updatePhong(event.getPhong()) ? "true" : "false";
+                break;
+            case "phong_delete":
+                result = deletePhong(event.getPhong()) ? "true" : "false";
+                break;
+            case "phong_fetch_all":
+                result = getAllPhong();
+                break;
             default:
                 System.out.println("Error: action khong hop le: " + event.getAction());
                 break;
@@ -135,6 +147,47 @@ public class ServerController {
                 ts.setViTriPhong(rs.getString("vi_tri_phong_hien_tai"));
                 ts.setGiaTri(rs.getDouble("gia_tri"));
                 list.add(ts);
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    private boolean addPhong(Model.Phong phong) {
+        String query = "INSERT INTO `phong`(`ten`, `mo_ta`) VALUES ('"
+                + phong.getTen() + "', '"
+                + phong.getMoTa() + "')";
+        return executeUpdate(query);
+    }
+
+    private boolean updatePhong(Model.Phong phong) {
+        String query = "UPDATE `phong` SET "
+                + "`ten`='" + phong.getTen() + "', "
+                + "`mo_ta`='" + phong.getMoTa() + "' "
+                + "WHERE `ma_phong`=" + phong.getMaPhong();
+        return executeUpdate(query);
+    }
+
+    private boolean deletePhong(Model.Phong phong) {
+        String query = "DELETE FROM `phong` WHERE `ma_phong`=" + phong.getMaPhong();
+        return executeUpdate(query);
+    }
+
+    private java.util.List<Model.Phong> getAllPhong() {
+        java.util.List<Model.Phong> list = new java.util.ArrayList<>();
+        String query = "SELECT `ma_phong`, `ten`, `mo_ta` FROM `phong`";
+        try {
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                Model.Phong phong = new Model.Phong();
+                phong.setMaPhong(rs.getInt("ma_phong"));
+                phong.setTen(rs.getString("ten"));
+                phong.setMoTa(rs.getString("mo_ta"));
+                list.add(phong);
             }
             rs.close();
             stmt.close();
